@@ -1,8 +1,9 @@
 pipeline{
-    agent {label 'mac_mini'}
+    agent { label 'mac_mini' }
 
-    environment{
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub_creds')
+    environment {
+        DOCKERHUB_USERNAME = credentials('amarmg04')   // store username in Jenkins
+        DOCKERHUB_PASSWORD = credentials('ManAmar*123')   // store password or PAT in Jenkins
         DOCKER_IMAGE = "amarmg04/ci-demo"
     }
 
@@ -14,37 +15,45 @@ pipeline{
                     credentialsId: 'github-pat'
             }
         }
+
         stage('Build'){
-             steps {
+            steps {
                 sh 'npm install'
             }
         }
+
         stage('Test'){
             steps{
                 sh 'npm test -- --ci --detectOpenHandles'
             }
         }
-        stage('Docker Build & Push') {
-            steps {
+
+        stage('Docker Build & Push'){
+            steps{
                 script {
-                    // This logs in automatically using Jenkins credential ID 'dockerhub_creds'
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_creds') {
-                        def image = docker.build("amarmg04/ci-demo:${BUILD_NUMBER}")
-                        image.push()
-                    }
+                    // Log in securely using --password-stdin
+                    sh """
+                        echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                        docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} .
+                        docker push $DOCKER_IMAGE:${BUILD_NUMBER}
+                        docker tag $DOCKER_IMAGE:${BUILD_NUMBER} $DOCKER_IMAGE:latest
+                        docker push $DOCKER_IMAGE:latest
+                    """
                 }
             }
         }
+
         stage('Deploy'){
             steps{
-                sh '''
+                sh """
                     docker stop ci-demo || true
                     docker rm ci-demo || true
                     docker run -d --name ci-demo -p 3000:3000 $DOCKER_IMAGE:latest
-                '''
+                """
             }
         }
     }
+
     post{
         always{
             echo 'Pipeline Finished!'
