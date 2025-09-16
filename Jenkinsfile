@@ -1,9 +1,10 @@
 pipeline{
-    agent { label 'mac_mini' }
+    agent {label 'mac_mini'}
 
-    environment {
+    environment{
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub_creds')
         DOCKERHUB_USERNAME = credentials('amarmg04')   // store username in Jenkins
-        DOCKERHUB_PASSWORD = credentials('ManAmar*123')   // store password or PAT in Jenkins
+        DOCKERHUB_PASSWORD = credentials('ManAmar*123')
         DOCKER_IMAGE = "amarmg04/ci-demo"
     }
 
@@ -15,20 +16,17 @@ pipeline{
                     credentialsId: 'github-pat'
             }
         }
-
         stage('Build'){
-            steps {
+             steps {
                 sh 'npm install'
             }
         }
-
         stage('Test'){
             steps{
                 sh 'npm test -- --ci --detectOpenHandles'
             }
         }
-
-        stage('Docker Build & Push'){
+         stage('Docker Build & Push'){
             steps{
                 script {
                     // Log in securely using --password-stdin
@@ -42,18 +40,16 @@ pipeline{
                 }
             }
         }
-
         stage('Deploy'){
             steps{
-                sh """
+                sh '''
                     docker stop ci-demo || true
                     docker rm ci-demo || true
                     docker run -d --name ci-demo -p 3000:3000 $DOCKER_IMAGE:latest
-                """
+                '''
             }
         }
     }
-
     post{
         always{
             echo 'Pipeline Finished!'
