@@ -3,8 +3,6 @@ pipeline{
 
     environment{
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_creds')
-        DOCKERHUB_USERNAME = credentials('amarmg04')   // store username in Jenkins
-        DOCKERHUB_PASSWORD = credentials('ManAmar*123')
         DOCKER_IMAGE = "amarmg04/ci-demo"
     }
 
@@ -31,7 +29,7 @@ pipeline{
                 script {
                     // Log in securely using --password-stdin
                     sh """
-                        echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                        echo "$DOCKERHUB_CREDS_PSW" | docker login -u "$DOCKERHUB_CREDS_USR" --password-stdin
                         docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} .
                         docker push $DOCKER_IMAGE:${BUILD_NUMBER}
                         docker tag $DOCKER_IMAGE:${BUILD_NUMBER} $DOCKER_IMAGE:latest
