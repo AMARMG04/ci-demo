@@ -4,6 +4,7 @@ pipeline{
     environment{
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_creds')
         DOCKER_IMAGE = "amarmg04/ci-demo"
+        PATH = "/opt/homebrew/bin:${env.PATH}"
     }
 
     stages{
@@ -16,9 +17,7 @@ pipeline{
         }
         stage('Build'){
              steps {
-                withEnv(["PATH=/opt/homebrew/bin:${env.PATH}"]) {
-                    sh 'npm install'
-                }
+                sh 'npm install'
             }
         }
         stage('Test'){
