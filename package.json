@@ -1,0 +1,24 @@
+{
+  "name": "ci-demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest --ci"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "supertest": "^6.3.0",
+    "jest-junit": "^13.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "reporters": [
+      "default",
+      ["jest-junit", { "outputDirectory": "reports", "outputName": "junit.xml" }]
+    ]
+  }
+}
