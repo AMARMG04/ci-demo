@@ -1,5 +1,5 @@
 const request = require("supertest");
-const app = require("../index");
+const app = require("../app"); // use the express app, not index.js
 
 describe("basic routes", () => {
   it("GET / returns JSON", async () => {
