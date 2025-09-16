@@ -4,7 +4,7 @@ pipeline{
     environment{
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_creds')
         DOCKER_IMAGE = "amarmg04/ci-demo"
-        PATH = "/opt/homebrew/bin:${env.PATH}"
+        PATH = "/opt/homebrew/bin:/usr/local/bin:${env.PATH}"
     }
 
     stages{
