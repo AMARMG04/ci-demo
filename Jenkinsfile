@@ -24,20 +24,24 @@ pipeline{
                 sh 'npm test -- --ci --detectOpenHandles'
             }
         }
-         stage('Docker Build & Push'){
+         stage('Docker Build & Push') {
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub_creds',
-                                                    usernameVariable: 'DOCKER_USER',
-                                                    passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub_creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    script {
                         sh """
-                            # Log in securely to Docker
-                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                            # Use a temporary Docker config folder to avoid macOS Keychain
+                            export DOCKER_CONFIG=\$WORKSPACE/.docker
+                            mkdir -p \$DOCKER_CONFIG
 
-                            # Build the Docker image with build number tag
+                            # Login non-interactively
+                            echo "\$DOCKER_PASS" | docker login -u "\$DOCKER_USER" --password-stdin
+
+                            # Build and push image
                             docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} .
-
-                            # Push the build-number-tagged image
                             docker push $DOCKER_IMAGE:${BUILD_NUMBER}
 
                             # Tag as latest and push
