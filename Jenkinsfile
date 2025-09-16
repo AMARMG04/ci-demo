@@ -25,16 +25,26 @@ pipeline{
             }
         }
          stage('Docker Build & Push'){
-            steps{
+            steps {
                 script {
-                    // Log in securely using --password-stdin
-                    sh """
-                        echo "$DOCKERHUB_CREDS_PSW" | docker login -u "$DOCKERHUB_CREDS_USR" --password-stdin
-                        docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} .
-                        docker push $DOCKER_IMAGE:${BUILD_NUMBER}
-                        docker tag $DOCKER_IMAGE:${BUILD_NUMBER} $DOCKER_IMAGE:latest
-                        docker push $DOCKER_IMAGE:latest
-                    """
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub_creds',
+                                                    usernameVariable: 'DOCKER_USER',
+                                                    passwordVariable: 'DOCKER_PASS')]) {
+                        sh """
+                            # Log in securely to Docker
+                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+                            # Build the Docker image with build number tag
+                            docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} .
+
+                            # Push the build-number-tagged image
+                            docker push $DOCKER_IMAGE:${BUILD_NUMBER}
+
+                            # Tag as latest and push
+                            docker tag $DOCKER_IMAGE:${BUILD_NUMBER} $DOCKER_IMAGE:latest
+                            docker push $DOCKER_IMAGE:latest
+                        """
+                    }
                 }
             }
         }
