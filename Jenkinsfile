@@ -47,6 +47,7 @@ pipeline{
                     docker stop ci-demo || true
                     docker rm ci-demo || true
                     docker run -d --name ci-demo -p 3000:3000 $DOCKER_IMAGE:latest
+                '''
             }
         }
     }
