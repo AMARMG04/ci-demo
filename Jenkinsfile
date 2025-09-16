@@ -29,7 +29,7 @@ pipeline{
             steps {
                 script {
                     // This logs in automatically using Jenkins credential ID 'dockerhub_creds'
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_creds') {
                         def image = docker.build("amarmg04/ci-demo:${BUILD_NUMBER}")
                         image.push()
                     }
