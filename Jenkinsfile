@@ -18,6 +18,7 @@ pipeline{
              steps {
                 withEnv(["PATH=/opt/homebrew/bin:${env.PATH}"]) {
                     sh 'npm install'
+                }
             }
         }
         stage('Test'){
