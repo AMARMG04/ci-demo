@@ -33,9 +33,11 @@ pipeline{
                 )]) {
                     script {
                         sh '''
-                            # Use a temporary Docker config folder to avoid macOS Keychain
                             export DOCKER_CONFIG=$WORKSPACE/.docker
                             mkdir -p $DOCKER_CONFIG
+
+                            # Disable Keychain helper
+                            echo '{ "credsStore": "" }' > $DOCKER_CONFIG/config.json
 
                             # Login non-interactively
                             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
