@@ -36,8 +36,12 @@ pipeline{
                             export DOCKER_CONFIG=$WORKSPACE/.docker
                             mkdir -p $DOCKER_CONFIG
 
-                            # Disable Keychain helper
-                            echo '{ "credsStore": "" }' > $DOCKER_CONFIG/config.json
+                            # Write config to disable credential store
+                            cat > $DOCKER_CONFIG/config.json << EOF
+        {
+            "credsStore": ""
+        }
+        EOF
 
                             # Login non-interactively
                             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
@@ -54,6 +58,7 @@ pipeline{
                 }
             }
         }
+
         stage('Deploy'){
             steps{
                 sh '''
