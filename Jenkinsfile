@@ -33,17 +33,7 @@ pipeline{
                 )]) {
                     script {
                         sh '''
-                            export DOCKER_CONFIG=$WORKSPACE/.docker
-                            mkdir -p $DOCKER_CONFIG
-
-                            # Write config to disable credential store
-                            cat > $DOCKER_CONFIG/config.json << EOF
-        {
-            "credsStore": ""
-        }
-        EOF
-
-                            # Login non-interactively
+                            # Simple login - no keychain issues with Colima
                             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
                             # Build and push image
@@ -58,7 +48,6 @@ pipeline{
                 }
             }
         }
-
         stage('Deploy'){
             steps{
                 sh '''
