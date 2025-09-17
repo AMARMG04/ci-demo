@@ -32,13 +32,13 @@ pipeline{
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     script {
-                        sh """
+                        sh '''
                             # Use a temporary Docker config folder to avoid macOS Keychain
-                            export DOCKER_CONFIG=\$WORKSPACE/.docker
-                            mkdir -p \$DOCKER_CONFIG
+                            export DOCKER_CONFIG=$WORKSPACE/.docker
+                            mkdir -p $DOCKER_CONFIG
 
                             # Login non-interactively
-                            echo "\$DOCKER_PASS" | docker login -u "\$DOCKER_USER" --password-stdin
+                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
                             # Build and push image
                             docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} .
@@ -47,7 +47,7 @@ pipeline{
                             # Tag as latest and push
                             docker tag $DOCKER_IMAGE:${BUILD_NUMBER} $DOCKER_IMAGE:latest
                             docker push $DOCKER_IMAGE:latest
-                        """
+                        '''
                     }
                 }
             }
