@@ -33,7 +33,10 @@ pipeline{
                 )]) {
                     script {
                         sh '''
-                            # Simple login - no keychain issues with Colima
+                            # Unlock keychain for remote session
+                            security unlock-keychain -p "" ~/Library/Keychains/login.keychain-db
+
+                            # Login to Docker
                             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
                             # Build and push image
